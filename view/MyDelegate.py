@@ -10,4 +10,4 @@ class MyDelegate(QItemDelegate):
     def paint(self, painter: QPainter, option: QStyleOptionViewItem, idx: QModelIndex):
         painter.save()
         self.parent().on_item_paint(idx, painter, option)
-        painter.restore()  
+        painter.restore()

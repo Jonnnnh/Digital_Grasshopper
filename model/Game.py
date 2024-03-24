@@ -44,45 +44,28 @@ class Game:
 
     def init_game_field(self):
         level = Utils.read_int_multy_array_form_file(self._current_level)
-        self._col_count = len(level[0])
-        self._row_count = len(level)
+        self._col_count, self._row_count = len(level[0]), len(level)
+        self._field = [[GameCell() for _ in range(self.col_count)] for _ in range(self.row_count)]
 
-        self._field = [
-            copy.deepcopy([GameCell() for c in range(self.col_count)])
-            for r in range(self.row_count)
-        ]
-        for row in range(len(level)):
-            for column in range(len(level[0])):
-                cell = level[row][column]
-                if cell == 1:
-                    self._field[row][column] = GameCell(block=True, number=1)
-                if cell == 2:
-                    self._field[row][column] = GameCell(block=True, number=2)
-                if cell == 3:
-                    self._field[row][column] = GameCell(block=True, number=3)
-                if cell == 4:
-                    self._field[row][column] = GameCell(block=True, number=4)
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                cell_value = level[row][col]
+                if cell_value in [1, 2, 3, 4]:
+                    self._field[row][col] = GameCell(block=True, number=cell_value)
 
     def find_steps(self, row, column):
-        if self._current_cell is None or not self._current_cell.block or self._current_cell.step:
-            return
-        else:
-            step = self._current_cell.number
-            self.check_neighbor(row - step, column)
-            self.check_neighbor(row + step, column)
-            self.check_neighbor(row, column - step)
-            self.check_neighbor(row, column + step)
-            self.check_neighbor(row - step, column + step)
-            self.check_neighbor(row + step, column + step)
-            self.check_neighbor(row - step, column - step)
-            self.check_neighbor(row + step, column - step)
+        step = self._current_cell.number
+        directions = [(step, 0), (-step, 0), (0, step), (0, -step),
+                      (step, step), (-step, -step), (step, -step), (-step, step)]
+        for dr, dc in directions:
+            self.check_neighbor(row + dr, column + dc)
 
     def check_neighbor(self, row, column):
-        if row < 0 or row >= len(self._field) or column < 0 or column >= len(self.field[row]):
-            return
-        elif not self._field[row][column].block and not self._field[row][column].step:
-            self._field[row][column]._step = True
-            self._steps.append([row, column])
+        if 0 <= row < self._row_count and 0 <= column < self._col_count:
+            cell = self._field[row][column]
+            if not cell.block and not cell.step:
+                cell._step = True
+                self._steps.append([row, column])
 
     def swap_cells(self, row, col):
         for cell in self._steps:
