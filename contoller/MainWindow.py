@@ -1,6 +1,6 @@
+from PyQt5 import QtWidgets, uic
 import os
 
-from view.MainWindowUI import Ui_MainWindow as MainWindowUI
 from PyQt5 import QtSvg
 from PyQt5.QtGui import QMouseEvent, QPainter, QStandardItemModel
 from PyQt5.QtWidgets import QMainWindow, QStyleOptionViewItem
@@ -10,10 +10,18 @@ from model.Game import Game
 from view.MyDelegate import MyDelegate
 
 
-class MainWindow(QMainWindow, MainWindowUI):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui(self)
+
+        ui_path = 'C:/Users/Daria/PycharmProjects/DigitalGrasshopper/MainWindowUI.ui'
+        uic.loadUi(ui_path, self)
+
+        self.setFixedSize(720, 800)
+        self.centerWindow()
+        if not hasattr(self, 'tableView'):
+            raise AttributeError(
+                "UI file does not contain 'tableView'. Check if the UI file is correct and the path is valid.")
 
         images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources/images')
         self._images = {
@@ -24,18 +32,24 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.game = Game(1)
         self.game_resize(self.game)
 
-        self.game_field.setItemDelegate(MyDelegate(self))
-        self.new_game_Button.clicked.connect(self.new_game)
+        self.tableView.setItemDelegate(MyDelegate(self))
+        self.pushButton.clicked.connect(self.new_game)
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
-            idx = self.game_field.indexAt(e.pos())
+            idx = self.tableView.indexAt(e.pos())
             self.on_item_clicked(idx, e)
 
-        self.game_field.mousePressEvent = new_mouse_press_event
+        self.tableView.mousePressEvent = new_mouse_press_event
+
+    def centerWindow(self):
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        center_x = (screen.width() - self.width()) // 2
+        center_y = (screen.height() - self.height()) // 2
+        self.move(center_x, center_y)
 
     def game_resize(self, game: Game) -> None:
         model = QStandardItemModel(game.row_count, game.col_count)
-        self.game_field.setModel(model)
+        self.tableView.setModel(model)
         self.resize(game.col_count * 60 + 20, game.row_count * 50 + 116)
         self.update_view()
 
@@ -44,7 +58,7 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.update_view()
 
     def update_view(self):
-        self.game_field.viewport().update()
+        self.tableView.viewport().update()
 
     def on_item_paint(self, e: QModelIndex, painter: QPainter, option: QStyleOptionViewItem) -> None:
         cell = self.game.field[e.row()][e.column()]
