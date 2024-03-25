@@ -40,6 +40,22 @@ class Game:
     def current_level(self) -> int:
         return self._current_level
 
+    @property
+    def has_moves_left(self) -> bool:
+        for row in self._field:
+            for cell in row:
+                if cell.block and not cell.is_locked:
+                    return True
+        return False
+
+    @property
+    def is_completed(self) -> bool:
+        for row in self._field:
+            for cell in row:
+                if not cell.is_locked:
+                    return False
+        return True
+
     def init_game_field(self):
         level = Utils.read_int_multy_array_form_file(self._current_level)
         self._col_count, self._row_count = len(level[0]), len(level)

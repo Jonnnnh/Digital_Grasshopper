@@ -3,7 +3,7 @@ import os
 
 from PyQt5 import QtSvg
 from PyQt5.QtGui import QMouseEvent, QPainter, QStandardItemModel
-from PyQt5.QtWidgets import QStyleOptionViewItem, QHeaderView
+from PyQt5.QtWidgets import QStyleOptionViewItem, QHeaderView, QMessageBox
 from PyQt5.QtCore import QModelIndex, QRectF, Qt
 
 from model.Game import Game
@@ -40,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.game_resize(self.game)
         self.tableView.setItemDelegate(MyDelegate(self))
         self.pushButton.clicked.connect(self.new_game)
+        self.pushButton_2.clicked.connect(self.close)
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
             idx = self.tableView.indexAt(e.pos())
@@ -105,6 +106,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.is_game_over()
         self.update_view()
 
-    @staticmethod
-    def is_game_over():
-        pass
+    def is_game_over(self):
+        if self.game.is_completed or not self.game.has_moves_left:
+            message = "Game Over!"
+            if self.game.is_completed:
+                message += "Congratulations, you've completed the game!"
+            else:
+                message += "No more moves left"
+
+            QMessageBox.information(self, "Game Over", message)
