@@ -1,5 +1,3 @@
-import copy
-
 from model.GameState import GameState
 from model.GameCell import GameCell
 from model.Utils import Utils
