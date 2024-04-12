@@ -92,6 +92,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.refresh_game_view()
 
     def check_game_over(self):
-        if self.game.is_completed or not self.game.has_moves_left:
-            message = "Game Over! Congratulations, you've completed the game!" if self.game.is_completed else "Game Over! No more moves left"
+        if not self.game.has_moves_left:
+            message = "Game Over! No more moves left."
             QMessageBox.information(self, "Game Over", message)
