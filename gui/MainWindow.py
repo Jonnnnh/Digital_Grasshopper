@@ -13,7 +13,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        ui_path = 'C:/Users/Daria/PycharmProjects/DigitalGrasshopper/MainWindowUI.ui'
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        ui_path = os.path.join(base_dir, 'gui', 'ui', 'MainWindowUI.ui')
+
         if not os.path.exists(ui_path):
             raise FileNotFoundError(f"UI file '{ui_path}' does not exist")
         try:
@@ -26,7 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.center_window()
         self.check_ui_components()
         self._images = {}
-        images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources/images')
+        images_dir = os.path.join(base_dir, 'resources', 'images')
         self.load_image_resources(images_dir)
 
         self.game = Game(1)
